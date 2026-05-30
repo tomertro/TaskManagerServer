@@ -10,6 +10,17 @@ builder.Services.AddSwaggerGen();
 // Register TaskService
 builder.Services.AddSingleton<TaskManagerServer.Services.TaskService>();
 
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+  options.AddPolicy("AllowAngularApp", policy =>
+  {
+    policy.WithOrigins("http://localhost:4200")
+          .AllowAnyHeader()
+          .AllowAnyMethod();
+  });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -19,7 +30,11 @@ if (app.Environment.IsDevelopment())
   app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// Enable CORS first - before other middleware
+app.UseCors("AllowAngularApp");
+
+// Comment out HTTPS redirection for development
+// app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
